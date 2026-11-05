@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Paz en la Tierra · Party Quiz</title>
+<style>
+:root{--bg:#f6f1e7;--fg:#1d2433;--card:#fff;--mut:#667085;--ac:#2f5d8a;--ok:#2e8b57;--bad:#c0392b;--bd:#d9d2c3;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a26;--fg:#eef1f7;--card:#1f2838;--mut:#9aa6bb;--ac:#7fb2e5;--ok:#4cc28a;--bad:#ef6b5b;--bd:#33405a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141a26;--fg:#eef1f7;--card:#1f2838;--mut:#9aa6bb;--ac:#7fb2e5;--ok:#4cc28a;--bad:#ef6b5b;--bd:#33405a;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Trebuchet MS",system-ui,sans-serif;min-height:100vh}
+main{max-width:1000px;margin:0 auto;padding:16px}
+h1{font-family:Georgia,serif;text-align:center;margin:8px 0 2px;font-size:clamp(1.6rem,5vw,2.4rem)}
+.sub{text-align:center;color:var(--mut);margin:0 0 18px}
+.card{background:var(--card);border:2px solid var(--bd);border-radius:16px;padding:16px}
+button{font:inherit;cursor:pointer;color:var(--fg)}
+.big{background:var(--ac);color:#fff;border:0;border-radius:12px;padding:12px 26px;font-weight:700;font-size:1.05rem}
+.big:hover{filter:brightness(1.1)}
+input{font:inherit;padding:8px 10px;border-radius:10px;border:2px solid var(--bd);background:var(--bg);color:var(--fg);width:100%}
+.srow{display:flex;gap:10px;align-items:center;margin:8px 0}
+.srow span{font-size:1.8rem}
+.hide{display:none!important}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:700;flex-wrap:wrap}
+.pill{background:var(--ac);color:#fff;border-radius:99px;padding:4px 12px;font-size:.9rem}
+.bar{height:10px;background:var(--bd);border-radius:9px;overflow:hidden;margin:10px 0}
+.bar i{display:block;height:100%;width:100%;background:var(--ac)}
+#q{font-family:Georgia,serif;font-size:clamp(1.15rem,3.4vw,1.6rem);text-align:center;margin:10px 0 16px;min-height:3.2em}
+.zones{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(max-width:640px){.zones{grid-template-columns:1fr}}
+.z{border:3px solid var(--c);border-radius:14px;padding:10px;background:var(--card)}
+.zh{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin-bottom:8px}
+.zh em{font-style:normal;color:var(--c)}
+.os{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.o{background:var(--bg);border:2px solid var(--bd);border-radius:10px;padding:8px;text-align:left;font-size:.9rem;min-height:48px}
+.o b{display:inline-block;background:var(--c);color:#fff;border-radius:6px;padding:0 6px;margin-right:6px;font-size:.8rem}
+.o.sel{border-color:var(--c);outline:2px solid var(--c)}
+.o.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.o.no{background:var(--bad);color:#fff;border-color:var(--bad)}
+.st{font-size:.85rem;color:var(--mut);margin-top:6px;min-height:1.2em}
+.gain{color:var(--ok);font-weight:700}
+.rk{display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid var(--bd);font-size:1.15rem}
+.win{font-size:1.5rem;text-align:center;margin:10px 0;font-family:Georgia,serif}
+.c{text-align:center;margin-top:14px}
+.help{font-size:.85rem;color:var(--mut);margin-top:10px}
+</style></head><body><main>
+<h1>Pacem in Terris</h1>
+<p class="sub">El juego de preguntas sobre la encíclica <i>Pacem in Terris</i> (Juan XXIII, 1963)</p>
+
+<section id="setup" class="card">
+<h3 style="margin-top:0">Los cuatro jugadores</h3>
+<div class="srow"><span></span><input id="n0" placeholder="Jugador 1" maxlength="14"></div>
+<div class="srow"><span></span><input id="n1" placeholder="Jugador 2" maxlength="14"></div>
+<div class="srow"><span></span><input id="n2" placeholder="Jugador 3" maxlength="14"></div>
+<div class="srow"><span></span><input id="n3" placeholder="Jugador 4" maxlength="14"></div>
+<p class="help">10 rondas · 15 segundos por pregunta · todos responden a la vez. Teclas: 1-2-3-4 · Z-X-C-V · U-I-O-P · N-M-,-.</p>
+<div class="c"><button class="big" id="go">¡Empezar!</button></div>
+</section>
+
+<section id="game" class="hide">
+<div class="top"><span class="pill" id="rn"></span><span id="lab"></span><span id="sec">15</span></div>
+<div class="bar"><i id="bar"></i></div>
+<div id="q"></div>
+<div class="zones" id="zones"></div>
+<div class="c"><button class="big hide" id="nx">Siguiente ▶</button></div>
+</section>
+
+<section id="end" class="card hide">
+<h2 style="text-align:center;margin-top:0">🏆 Resultado final</h2>
+<div class="win" id="win"></div><div id="rank"></div>
+<div class="c"><button class="big" id="again">Jugar de nuevo</button></div>
+</section>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const P=[{e:"🕊️",c:"#2f7fc1",k:"1234"},{e:"🌍",c:"#2e9b6a",k:"ZXCV"},{e:"⚖️",c:"#c98a1b",k:"UIOP"},{e:"📜",c:"#a84f9e",k:"NM,."}];
+const SEQ=["rapida","vf","oro","rul","rapida","vf","oro","rul","rapida","oro"];
+const LB={rapida:"Pregunta rápida",vf:"Verdadero o falso",oro:"Pregunta de oro ✨"};
+const CATS=["Derechos humanos","Autoridad y bien común","Paz y desarme","Comunidad mundial"];
+const D={
+rapida:[
+["¿Quién firmó la encíclica Pacem in Terris?",["Juan XXIII","Pío XII","Pablo VI","Juan Pablo II"],0],
+["¿En qué año se publicó Pacem in Terris?",["1958","1963","1965","1978"],1],
+["¿A quiénes se dirige, además de a los católicos?",["Solo a los obispos","A todos los hombres de buena voluntad","Solo a los gobernantes","Solo a los diplomáticos"],1],
+["¿Cuáles son los cuatro pilares del orden de la paz?",["Verdad, justicia, caridad y libertad","Verdad, justicia, igualdad y fraternidad","Fe, esperanza, caridad y prudencia","Orden, poder, riqueza y fuerza"],0],
+["¿Qué crisis internacional ocurrió pocos meses antes de la encíclica?",["Guerra de Corea","Crisis de los misiles de Cuba","Guerra de los Seis Días","Caída del Muro de Berlín"],1]],
+vf:[
+["Según la encíclica, todo ser humano es persona, con derechos y deberes que brotan de su propia naturaleza.",true],
+["Según la encíclica, los derechos humanos son concesiones del Estado que este puede dar o quitar a su gusto.",false],
+["La encíclica pide que el desarme sea recíproco y con control eficaz.",true],
+["La encíclica prohíbe toda colaboración con personas que no son católicas.",false],
+["La encíclica reconoce el derecho de las personas a emigrar e inmigrar.",true]],
+oro:[
+["¿Qué relación establece la encíclica entre derechos y deberes?",["Son independientes","Son correlativos en la misma persona","Los deberes anulan los derechos","Solo existen derechos de los Estados"],1],
+["¿Cuál de estos es señalado como “signo de los tiempos”?",["El ascenso económico y social de los trabajadores","La aparición de internet","El fin de la Guerra Fría","La exploración espacial"],0],
+["¿Qué documento de la ONU valora la encíclica como un paso hacia el orden jurídico mundial?",["La Carta de La Haya","La Declaración Universal de Derechos Humanos","El Tratado de Versalles","El Acta de Helsinki"],1],
+["¿Qué afirma la encíclica sobre la guerra en la era atómica?",["Es un medio adecuado para reparar derechos violados","Es contrario a la razón considerarla instrumento de justicia","Es siempre obligatoria","Solo está prohibida a las potencias menores"],1]],
+rul:[
+["Derechos humanos",100,"¿De qué derecho parten todos los demás, según la encíclica?",["El derecho a la vida y a un nivel de vida digno","El derecho a gobernar","El derecho a poseer armas","El derecho a no pagar impuestos"],0],
+["Autoridad y bien común",150,"¿En última instancia, de dónde proviene la autoridad según la encíclica?",["Del poder militar","De Dios, autor del orden moral","De la riqueza","Solo de los votos"],1],
+["Autoridad y bien común",100,"¿Cuál es el fin de la autoridad pública?",["El bien común","El interés del gobernante","La expansión territorial","La acumulación de riqueza"],0],
+["Paz y desarme",150,"¿En qué debe apoyarse la verdadera paz entre las naciones?",["En el equilibrio del terror","En la confianza recíproca","En la superioridad militar","En la neutralidad total"],1],
+["Comunidad mundial",200,"La encíclica pide una autoridad pública mundial que respete el principio de…",["Subsidiariedad","Mercantilismo","Aislacionismo","Autarquía"],0],
+["Comunidad mundial",150,"¿Cómo deben ser tratadas las minorías étnicas?",["Con respeto a sus derechos, lengua y cultura","Con asimilación forzosa","Con expulsión","Ignorándolas"],0]]
+};
+const used={};
+function pick(a,k){used[k]=used[k]||[];let c=a.map((_,i)=>i).filter(i=>!used[k].includes(i));if(!c.length){used[k]=[];c=a.map((_,i)=>i)}const i=c[Math.random()*c.length|0];used[k].push(i);return a[i]}
+let G,cur,ans,dl,tm,open=false,phase="setup";
+function show(id){["setup","game","end"].forEach(s=>$("#"+s).classList.toggle("hide",s!==id));phase=id}
+function start(){G={r:0,pl:[0,1,2,3].map(i=>({n:$("#n"+i).value.trim()||"Jugador "+(i+1),s:0}))};show("game");round()}
+async function round(){
+ const t=SEQ[G.r];let c;
+ $("#rn").textContent="Ronda "+(G.r+1)+" / 10";$("#nx").classList.add("hide");$("#zones").innerHTML="";
+ if(t==="rapida"){const x=pick(D.rapida,"r");c={l:LB[t],p:100,q:x[0],o:x[1],ok:x[2]}}
+ else if(t==="vf"){const x=pick(D.vf,"v");c={l:LB[t],p:100,q:x[0],o:["Verdadero","Falso"],ok:x[1]?0:1}}
+ else if(t==="oro"){const x=pick(D.oro,"o");c={l:LB[t],p:200,q:x[0],o:x[1],ok:x[2]}}
+ else{
+  $("#q").textContent="Girando la ruleta…";$("#sec").textContent="";
+  const cat=CATS[Math.random()*4|0];
+  for(let i=0;i<14;i++){$("#lab").textContent=CATS[i%4];await new Promise(r=>setTimeout(r,90+i*12))}
+  const x=pick(D.rul.filter(y=>y[0]===cat),"u"+cat);
+  c={l:"Ruleta · "+cat+" "+"★".repeat(x[1]/50-1),p:x[1],q:x[2],o:x[3],ok:x[4]};
+ }
+ cur=c;ans=[null,null,null,null];
+ $("#lab").textContent=c.l+" · +"+c.p;$("#q").textContent=c.q;
+ const z=$("#zones");
+ G.pl.forEach((p,i)=>{
+  const d=document.createElement("div");d.className="z";d.style.setProperty("--c",P[i].c);
+  d.innerHTML='<div class="zh"><span></span><em></em></div><div class="os"></div><div class="st"></div>';
+  d.querySelector("span").textContent=P[i].e+" "+p.n;d.querySelector("em").textContent=p.s;
+  c.o.forEach((t,j)=>{const b=document.createElement("button");b.className="o";b.innerHTML="<b>"+P[i].k[j]+"</b>";b.append(t);b.onclick=()=>choose(i,j);d.querySelector(".os").append(b)});
+  z.append(d);
+ });
+ dl=Date.now()+15000;open=true;clearInterval(tm);tm=setInterval(tick,100);tick();
+}
+function tick(){
+ const l=Math.max(0,dl-Date.now());$("#sec").textContent=Math.ceil(l/1000)+" s";$("#bar").style.width=(l/150)+"%";
+ if(l<=0)reveal();
+}
+function choose(p,j){
+ if(!open||ans[p]!==null)return;ans[p]=j;
+ const z=$("#zones").children[p];z.querySelectorAll(".o")[j].classList.add("sel");
+ z.querySelectorAll(".o").forEach(b=>b.disabled=true);z.querySelector(".st").textContent="✔ Ya respondió";
+ if(ans.every(a=>a!==null))reveal();
+}
+function reveal(){
+ if(!open)return;open=false;clearInterval(tm);$("#bar").style.width="0%";$("#sec").textContent="";
+ G.pl.forEach((p,i)=>{
+  const z=$("#zones").children[i],os=z.querySelectorAll(".o");
+  os.forEach(b=>b.disabled=true);os[cur.ok].classList.add("ok");
+  let g=0;
+  if(ans[i]===cur.ok)g=cur.p;else if(ans[i]!==null)os[ans[i]].classList.add("no");
+  p.s+=g;z.querySelector("em").textContent=p.s;
+  const st=z.querySelector(".st");
+  st.innerHTML=g?'<span class="gain">+'+g+'</span>':(ans[i]===null?"⏱ Sin respuesta · 0":"0 puntos");
+ });
+ const nx=$("#nx");nx.textContent=G.r>=9?"Ver resultado 🏆":"Siguiente ▶";nx.classList.remove("hide");
+}
+function next(){
+ if(open||phase!=="game")return;
+ if(G.r>=9)return finish();G.r++;round();
+}
+function finish(){
+ show("end");
+ const s=[...G.pl].sort((a,b)=>b.s-a.s),top=s.filter(p=>p.s===s[0].s);
+ $("#win").textContent=top.length>1?"🤝 Empate entre "+top.map(p=>p.n).join(" y "):"👑 ¡Gana "+top[0].n+"!";
+ const r=$("#rank");r.innerHTML="";
+ s.forEach((p,i)=>{const d=document.createElement("div");d.className="rk";d.textContent=(["🥇","🥈","🥉","4º"][i])+" "+p.n;const b=document.createElement("b");b.textContent=p.s+" pts";d.append(b);r.append(d)});
+}
+document.addEventListener("keydown",e=>{
+ if(phase==="game"){
+  if(!open){if(e.key==="Enter"){e.preventDefault();next()}return}
+  const k=e.key.toUpperCase();
+  P.forEach((p,i)=>{const j=p.k.indexOf(k);if(j>-1&&j<cur.o.length)choose(i,j)});
+ }
+});
+$("#go").onclick=start;$("#nx").onclick=next;$("#again").onclick=()=>show("setup");
+</script></body></html>
